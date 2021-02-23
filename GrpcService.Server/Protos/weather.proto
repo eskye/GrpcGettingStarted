@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "GrpcService.Server";
+
+package weather;
+
+//The weather service definition.
+
+service Weather {
+
+}
+
