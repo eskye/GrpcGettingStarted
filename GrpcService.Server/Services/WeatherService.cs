@@ -22,6 +22,16 @@
             _configuration = configuration;
             _logger = logger;
         }
+
+        public override async Task<Empty> PrintStream(IAsyncStreamReader<PrintRequest> requestStream, ServerCallContext context)
+        {
+            await foreach (var request in requestStream.ReadAllAsync())
+            {
+                _logger.LogInformation($"Client said: {request.Message}");
+            }
+            return new Empty();
+        }
+
         public override async Task<WeatherResponse> GetCurrentWeather(GetCurrentWeatherForCityRequest request,
             ServerCallContext context)
         {
@@ -40,22 +50,57 @@
             ServerCallContext context)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            for (int i = 0; i < 30; i++)
+            while (!context.CancellationToken.IsCancellationRequested)
             {
-                if (context.CancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogInformation("Request was cancelled");
-                    break;
-                }
                 var temperatures = await GetCurrentTemperaturesAsync(request, httpClient);
                 await responseStream.WriteAsync(new WeatherResponse
                 {
                     Temperature = temperatures!.Main.Temp,
                     FeelsLike = temperatures.Main.FeelsLike,
-                    Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
+                    Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
+                    City = request.City,
+                    Units = request.Units
                 });
                 await Task.Delay(1000);
             }
+            // for (int i = 0; i < 30; i++)
+            // {
+            //     if (context.CancellationToken.IsCancellationRequested)
+            //     {
+            //         _logger.LogInformation("Request was cancelled");
+            //         break;
+            //     }
+            //     var temperatures = await GetCurrentTemperaturesAsync(request, httpClient);
+            //     await responseStream.WriteAsync(new WeatherResponse
+            //     {
+            //         Temperature = temperatures!.Main.Temp,
+            //         FeelsLike = temperatures.Main.FeelsLike,
+            //         Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
+            //         City = request.City,
+            //         Units = request.Units
+            //     });
+            //     await Task.Delay(1000);
+            // }
+        }
+
+        public override async Task<MultiWeatherResponse> GetMultiCurrentWeatherStream(IAsyncStreamReader<GetCurrentWeatherForCityRequest>
+            requestStream, ServerCallContext context)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = new MultiWeatherResponse {Weather = { }};
+            await foreach (var request in requestStream.ReadAllAsync())
+            {
+                var temperatures = await GetCurrentTemperaturesAsync(request, httpClient);
+                response.Weather.Add(new WeatherResponse
+                {
+                    Temperature = temperatures!.Main.Temp,
+                    FeelsLike = temperatures.Main.FeelsLike,
+                    Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
+                    City = request.City,
+                    Units = request.Units
+                });
+            }
+            return response;
         }
 
 
