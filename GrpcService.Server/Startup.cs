@@ -17,6 +17,7 @@ namespace GrpcService.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -32,6 +33,7 @@ namespace GrpcService.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<GreeterService>();
+                endpoints.MapGrpcService<WeatherService>();
 
                 endpoints.MapGet("/", async context =>
                 {
