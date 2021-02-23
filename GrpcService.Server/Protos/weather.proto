@@ -7,6 +7,21 @@ package weather;
 //The weather service definition.
 
 service Weather {
+  rpc GetCurrentWeather (GetCurrentWeatherForCityRequest) returns (WeatherResponse);
+}
 
+message GetCurrentWeatherForCityRequest{
+string city = 1;
+enum Units{
+    Standard= 0;
+    Metric = 1;
+    Imperial = 2;
+ }
+ Units units = 2;
+}
+
+message WeatherResponse{
+    double temperature = 1;
+    double feels_like = 2;
 }
 
