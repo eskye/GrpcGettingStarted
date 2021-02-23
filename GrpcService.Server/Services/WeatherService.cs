@@ -63,24 +63,6 @@
                 });
                 await Task.Delay(1000);
             }
-            // for (int i = 0; i < 30; i++)
-            // {
-            //     if (context.CancellationToken.IsCancellationRequested)
-            //     {
-            //         _logger.LogInformation("Request was cancelled");
-            //         break;
-            //     }
-            //     var temperatures = await GetCurrentTemperaturesAsync(request, httpClient);
-            //     await responseStream.WriteAsync(new WeatherResponse
-            //     {
-            //         Temperature = temperatures!.Main.Temp,
-            //         FeelsLike = temperatures.Main.FeelsLike,
-            //         Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-            //         City = request.City,
-            //         Units = request.Units
-            //     });
-            //     await Task.Delay(1000);
-            // }
         }
 
         public override async Task<MultiWeatherResponse> GetMultiCurrentWeatherStream(IAsyncStreamReader<GetCurrentWeatherForCityRequest>
