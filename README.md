@@ -1,2 +1,2 @@
 # GrpcGettingStarted
-Explore GRPC possibilities
+Exploring GRPC possibilities
